@@ -33,6 +33,8 @@ def list_shower(listing, subreddits):
 parser = argparse.ArgumentParser(description='Filter reddit saved items by subreddit string')
 parser.add_argument('-s','--subreddit', nargs='*',
                    help='case-insensitive pattern to match subreddit names')
+parser.add_argument('-a', '--api',
+                    help='reddit api that returns a listing of submissions')
 parser.add_argument('-d', '--debug', action='store_true',
                     help='turn on debug of network connection')
 
@@ -51,6 +53,11 @@ if args.debug:
 # set up connection from praw.ini
 reddit = praw.Reddit()
 username = reddit.user.me()
+if args.api:
+    api=args.api
+else:
+    api="/user/{}/saved".format(username)
+print(api)
 
 # query saved history
 params=dict()
@@ -58,7 +65,7 @@ params['limit']=100
 
 
 while True:
-    saved=reddit.get("/user/{}/saved".format(username), params)
+    saved=reddit.get(api, params)
     list_shower(saved, args.subreddit)
     if saved.after == None:
         break
