@@ -43,7 +43,7 @@ def list_shower(listing, subreddits):
         # insert new items into history table
         history.insert_ignore(sub, ['id'], ensure=True)
 
-        if re.search(pattern, entry.subreddit_name_prefixed, re.IGNORECASE):
+        if re.search(pattern, entry.subreddit_name_prefixed, re.IGNORECASE) and not args.quiet:
             if args.json:
                 print(json.dumps(sub))
             else:
@@ -59,6 +59,8 @@ parser.add_argument('-j', '--json', action="store_true",
                     help='format output as json object')
 parser.add_argument('-f', '--file',
                     help='file to use a sqlite3 db')
+parser.add_argument('-q', '--quiet', action="store_true",
+                    help='supress output of filtered results')
 parser.add_argument('-d', '--debug', action='store_true',
                     help='turn on debug of network connection')
 
