@@ -60,7 +60,6 @@ if args.api:
     api=args.api
 else:
     api="/user/{}/saved".format(username)
-print(api)
 
 # query saved history
 params=dict()
