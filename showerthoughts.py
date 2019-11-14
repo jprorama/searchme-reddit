@@ -24,7 +24,7 @@ def list_shower(listing, subreddits):
         if hasattr(entry, 'title'):
             title=entry.title
         else:
-            title="NO TITLE"
+            title=None
         if hasattr(entry, 'url'):
             uri = entry.url
         else:
