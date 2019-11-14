@@ -8,6 +8,7 @@ import argparse
 import re
 from datetime import datetime, timezone
 import json
+import dataset
 
 def list_saved(listing):
     for entry in listing:
@@ -17,7 +18,10 @@ def list_saved(listing):
 def list_shower(listing, subreddits):
     
     pattern = '|'.join(subreddits)
-        
+
+    # create timestamp for insert time
+    now = datetime.today()
+
     for entry in listing:
         sub = dict()
 
@@ -32,7 +36,13 @@ def list_shower(listing, subreddits):
 
         utc = datetime.fromtimestamp(entry.created_utc, timezone.utc)
 
-        sub = dict(title=title , id=entry.id, utc=entry.created_utc, subreddit=entry.subreddit_name_prefixed, ups=entry.ups, url=uri) 
+        # create submission dict to simplify db save and json print
+        key = "{}:{}:{}".format(username,api,entry.id)
+        sub = dict(id=key, query_api=api, user="{}".format(username), content_id=entry.id, title=title , utc=entry.created_utc, subreddit=entry.subreddit_name_prefixed, ups=entry.ups, url=uri, timestamp=now)
+
+        # insert new items into history table
+        history.insert_ignore(sub, ['id'], ensure=True)
+
         if re.search(pattern, entry.subreddit_name_prefixed, re.IGNORECASE):
             if args.json:
                 print(json.dumps(sub))
@@ -47,10 +57,22 @@ parser.add_argument('-a', '--api',
                     help='reddit api that returns a listing of submissions')
 parser.add_argument('-j', '--json', action="store_true",
                     help='format output as json object')
+parser.add_argument('-f', '--file',
+                    help='file to use a sqlite3 db')
 parser.add_argument('-d', '--debug', action='store_true',
                     help='turn on debug of network connection')
 
 args = parser.parse_args()
+
+# connect to sqlite3 db for storing and updating queried data
+if args.file:
+    db = dataset.connect('sqlite:///{}'.format(args.file))
+else:
+    db = dataset.connect('sqlite:///reddit_history.db')
+
+history = db.create_table('history',
+                          primary_id='id',
+                          primary_type=db.types.text)
 
 # work around for defining default value or empty list with the append action
 # when no arguments are provided
