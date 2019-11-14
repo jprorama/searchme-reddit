@@ -27,7 +27,7 @@ def list_shower(listing, subreddits):
             uri = "https://reddit.com{}".format(entry.permalink)
             
         if re.search(pattern, entry.subreddit_name_prefixed, re.IGNORECASE):
-                 print("{}: {}: {}: {}".format(entry.ups, entry.subreddit_name_prefixed, title, uri))
+                 print("{}: {}: {}: {}: {}".format(entry.ups, entry.id, entry.subreddit_name_prefixed, title, uri))
 
 # collect list of search strings
 parser = argparse.ArgumentParser(description='Filter reddit saved items by subreddit string')
