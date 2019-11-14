@@ -6,6 +6,7 @@ import praw
 import logging
 import argparse
 import re
+from datetime import datetime, timezone
 
 def list_saved(listing):
     for entry in listing:
@@ -25,9 +26,11 @@ def list_shower(listing, subreddits):
             uri = entry.url
         else:
             uri = "https://reddit.com{}".format(entry.permalink)
+
+        utc = datetime.fromtimestamp(entry.created_utc, timezone.utc)
             
         if re.search(pattern, entry.subreddit_name_prefixed, re.IGNORECASE):
-                 print("{}: {}: {}: {}: {}".format(entry.ups, entry.id, entry.subreddit_name_prefixed, title, uri))
+                 print("{}|{}|{}|{}|{}|{}".format(entry.ups, entry.id, utc, entry.subreddit_name_prefixed, title, uri))
 
 # collect list of search strings
 parser = argparse.ArgumentParser(description='Filter reddit saved items by subreddit string')
